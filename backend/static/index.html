@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Call App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            height: 100vh;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            background: #f0f2f5;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+            flex: 1;
+        }
+
+        .video-container {
+            position: relative;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: #fff;
+            justify-content: center;
+        }
+
+        .control-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #0066cc;
+            color: white;
+        }
+
+        .control-btn.danger {
+            background: #dc3545;
+        }
+
+        .control-btn:hover {
+            opacity: 0.9;
+        }
+
+        .sidebar {
+            background: #fff;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .message {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: #e9ecef;
+            border-radius: 4px;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .file-share {
+            padding: 1rem;
+            border-top: 1px solid #ddd;
+        }
+
+        .name-badge {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 0.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div class="video-grid">
+                <div class="video-container">
+                    <video id="local-video" autoplay playsinline muted></video>
+                    <div class="name-badge">You</div>
+                </div>
+            </div>
+            <div class="controls">
+                <button class="control-btn" id="toggle-video">
+                    Video On
+                </button>
+                <button class="control-btn" id="toggle-audio">
+                    Audio On
+                </button>
+                <button class="control-btn" id="share-screen">
+                    Share Screen
+                </button>
+                <button class="control-btn danger" id="leave-room">
+                    Leave Room
+                </button>
+            </div>
+        </div>
+        <div class="sidebar">
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages"></div>
+                <div class="chat-input">
+                    <input type="text" id="message-input" placeholder="Type a message...">
+                    <button class="control-btn" id="send-message">Send</button>
+                </div>
+            </div>
+            <div class="file-share">
+                <input type="file" id="file-input">
+                <button class="control-btn" id="share-file">Share File</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://sdk.twilio.com/js/video/releases/2.21.0/twilio-video.min.js"></script>
+    <script>
+        class VideoCall {
+            constructor() {
+                this.room = null;
+                this.localTracks = [];
+                this.screenTrack = null;
+                this.isVideoEnabled = true;
+                this.isAudioEnabled = true;
+
+                this.initializeElements();
+                this.addEventListeners();
+            }
+
+            initializeElements() {
+                this.localVideo = document.getElementById('local-video');
+                this.toggleVideoBtn = document.getElementById('toggle-video');
+                this.toggleAudioBtn = document.getElementById('toggle-audio');
+                this.shareScreenBtn = document.getElementById('share-screen');
+                this.leaveRoomBtn = document.getElementById('leave-room');
+                this.messageInput = document.getElementById('message-input');
+                this.sendMessageBtn = document.getElementById('send-message');
+                this.chatMessages = document.getElementById('chat-messages');
+                this.fileInput = document.getElementById('file-input');
+                this.shareFileBtn = document.getElementById('share-file');
+            }
+
+            addEventListeners() {
+                this.toggleVideoBtn.addEventListener('click', () => this.toggleVideo());
+                this.toggleAudioBtn.addEventListener('click', () => this.toggleAudio());
+                this.shareScreenBtn.addEventListener('click', () => this.toggleScreenShare());
+                this.leaveRoomBtn.addEventListener('click', () => this.leaveRoom());
+                this.sendMessageBtn.addEventListener('click', () => this.sendMessage());
+                this.shareFileBtn.addEventListener('click', () => this.shareFile());
+            }
+
+            async joinRoom(roomName, token) {
+                try {
+                    // Create local tracks first
+                    this.localTracks = await Twilio.Video.createLocalTracks({
+                        audio: true,
+                        video: { width: 640, height: 480 }
+                    });
+
+                    // Set up local video
+                    const videoTrack = this.localTracks.find(track => track.kind === 'video');
+                    if (videoTrack) {
+                        videoTrack.attach(this.localVideo);
+                    }
+
+                    // Connect to the room
+                    this.room = await Twilio.Video.connect(token, {
+                        name: roomName,
+                        tracks: this.localTracks
+                    });
+
+                    console.log('Successfully joined room:', roomName);
+
+                    // Handle other participants
+                    this.room.participants.forEach(participant => this.handleParticipantConnected(participant));
+                    this.room.on('participantConnected', participant => this.handleParticipantConnected(participant));
+                    this.room.on('participantDisconnected', participant => this.handleParticipantDisconnected(participant));
+                } catch (error) {
+                    console.error('Error joining room:', error);
+                    alert('Failed to join room. Please make sure your camera and microphone are connected and you have granted the necessary permissions.');
+                }
+            }
+
+            handleParticipantConnected(participant) {
+                console.log('Participant connected:', participant.identity);
+                const container = document.createElement('div');
+                container.className = 'video-container';
+                container.id = participant.sid;
+                
+                const video = document.createElement('video');
+                video.autoplay = true;
+                video.playsinline = true;
+                container.appendChild(video);
+
+                const nameBadge = document.createElement('div');
+                nameBadge.className = 'name-badge';
+                nameBadge.textContent = participant.identity;
+                container.appendChild(nameBadge);
+
+                document.querySelector('.video-grid').appendChild(container);
+
+                participant.tracks.forEach(publication => {
+                    if (publication.isSubscribed) {
+                        this.handleTrackSubscribed(video, publication.track);
+                    }
+                });
+
+                participant.on('trackSubscribed', track => this.handleTrackSubscribed(video, track));
+                participant.on('trackUnsubscribed', track => this.handleTrackUnsubscribed(track));
+            }
+
+            handleParticipantDisconnected(participant) {
+                console.log('Participant disconnected:', participant.identity);
+                document.getElementById(participant.sid)?.remove();
+            }
+
+            handleTrackSubscribed(videoElement, track) {
+                if (track.kind === 'video') {
+                    track.attach(videoElement);
+                }
+            }
+
+            handleTrackUnsubscribed(track) {
+                track.detach().forEach(element => element.remove());
+            }
+
+            async toggleVideo() {
+                const videoTrack = this.localTracks.find(track => track.kind === 'video');
+                if (videoTrack) {
+                    if (this.isVideoEnabled) {
+                        await videoTrack.disable();
+                        this.toggleVideoBtn.textContent = 'Video Off';
+                    } else {
+                        await videoTrack.enable();
+                        this.toggleVideoBtn.textContent = 'Video On';
+                    }
+                    this.isVideoEnabled = !this.isVideoEnabled;
+                }
+            }
+
+            async toggleAudio() {
+                const audioTrack = this.localTracks.find(track => track.kind === 'audio');
+                if (audioTrack) {
+                    if (this.isAudioEnabled) {
+                        await audioTrack.disable();
+                        this.toggleAudioBtn.textContent = 'Audio Off';
+                    } else {
+                        await audioTrack.enable();
+                        this.toggleAudioBtn.textContent = 'Audio On';
+                    }
+                    this.isAudioEnabled = !this.isAudioEnabled;
+                }
+            }
+
+            async toggleScreenShare() {
+                if (!this.screenTrack) {
+                    try {
+                        const stream = await navigator.mediaDevices.getDisplayMedia();
+                        this.screenTrack = stream.getTracks()[0];
+                        this.room.localParticipant.publishTrack(this.screenTrack);
+                        this.shareScreenBtn.textContent = 'Stop Sharing';
+                    } catch (error) {
+                        console.error('Error sharing screen:', error);
+                    }
+                } else {
+                    this.room.localParticipant.unpublishTrack(this.screenTrack);
+                    this.screenTrack.stop();
+                    this.screenTrack = null;
+                    this.shareScreenBtn.textContent = 'Share Screen';
+                }
+            }
+
+            leaveRoom() {
+                if (this.room) {
+                    this.room.disconnect();
+                    this.room = null;
+                }
+                if (this.localTrack) {
+                    this.localTrack.stop();
+                    this.localTrack = null;
+                }
+                window.location.href = '/';
+            }
+
+            sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (message && this.room) {
+                    this.room.localParticipant.publishTrack({
+                        kind: 'data',
+                        data: JSON.stringify({
+                            type: 'chat',
+                            message,
+                            sender: this.room.localParticipant.identity
+                        })
+                    });
+                    this.addMessageToChat(message, 'You');
+                    this.messageInput.value = '';
+                }
+            }
+
+            addMessageToChat(message, sender) {
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message';
+                messageElement.textContent = `${sender}: ${message}`;
+                this.chatMessages.appendChild(messageElement);
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+
+            async shareFile() {
+                const file = this.fileInput.files[0];
+                if (file && this.room) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        this.room.localParticipant.publishTrack({
+                            kind: 'data',
+                            data: JSON.stringify({
+                                type: 'file',
+                                name: file.name,
+                                data: reader.result,
+                                sender: this.room.localParticipant.identity
+                            })
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+
+        // Initialize the video call
+        const videoCall = new VideoCall();
+
+        // Get token and room name from server then join room
+        async function initializeCall() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/token');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const { token, roomName } = await response.json();
+                console.log('Received token and room name:', { roomName });
+                await videoCall.joinRoom(roomName, token);
+            } catch (error) {
+                console.error('Error initializing call:', error);
+                alert('Failed to initialize call. Please try refreshing the page.');
+            }
+        }
+
+        initializeCall();
+    </script>
+</body>
+</html>

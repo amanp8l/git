@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Hire | Sign Up</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 440px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-name {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .logo-image img {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo_name {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a73e8;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 32px;
+            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #f8fafc;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #1a73e8;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+
+        .phone-container {
+            display: flex;
+            gap: 12px;
+        }
+
+        .phone-container input {
+            flex: 1;
+        }
+
+        .verify-btn {
+            padding: 0 24px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .verify-btn:hover:not(:disabled) {
+            background-color: #1557b0;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
+        }
+
+        .verify-btn:disabled {
+            background-color: #e2e8f0;
+            cursor: not-allowed;
+            color: #94a3b8;
+        }
+
+        .otp-container {
+            display: none;
+            margin-top: 12px;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background-color: #1557b0;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
+        }
+
+        .submit-btn:disabled {
+            background-color: #e2e8f0;
+            cursor: not-allowed;
+            color: #94a3b8;
+        }
+
+        .error {
+            color: #dc2626;
+            font-size: 14px;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 24px;
+            color: #4a5568;
+            font-size: 15px;
+        }
+
+        .signup-link a {
+            color: #1a73e8;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .phone-container {
+                flex-direction: column;
+            }
+
+            .verify-btn {
+                width: 100%;
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-name">
+            <div class="logo-image">
+                <img src="../images/logo.png" alt="Quick Hire Logo" style="border-radius: 50%;">
+            </div>
+            <span class="logo_name">Quick Hire</span>
+        </div>
+        <h1>Create Account</h1>
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="userType">I want to join as</label>
+                <select id="userType" required>
+                    <option value="developer">Developer</option>
+                    <option value="customer">Customer</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" placeholder="Enter your full name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <div class="phone-container">
+                    <input type="tel" id="phone" placeholder="Enter your phone number" required>
+                    <button type="button" id="verifyBtn" class="verify-btn">Send OTP</button>
+                </div>
+                <div id="otpContainer" class="otp-container">
+                    <input type="text" id="otp" placeholder="Enter OTP" maxlength="6" style="width: 70%;">
+                    <button type="button" id="verifyOtpBtn" class="verify-btn" style="padding-top: 15px; padding-bottom: 15px;">Verify</button>
+                </div>
+            </div>
+            
+            <div id="passwordContainer" style="display: none;">
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Create a password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm your password">
+                </div>
+            </div>
+            
+            <button type="submit" id="submitBtn" class="submit-btn" disabled>Create Account</button>
+            <div class="signup-link">
+                Already have an account?<a href="/login">Sign In</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://api.amanpatel.in';  // Change this to your API URL
+        
+        const form = document.getElementById('signupForm');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const otpContainer = document.getElementById('otpContainer');
+        const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+        const passwordContainer = document.getElementById('passwordContainer');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        let phoneVerified = false;
+        
+        verifyBtn.addEventListener('click', async () => {
+            const phone = document.getElementById('phone').value;
+            if (!phone) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/send-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ phone }),
+                });
+                
+                if (response.ok) {
+                    otpContainer.style.display = 'flex';
+                    verifyBtn.disabled = true;
+                } else {
+                    alert('Failed to send OTP. Please try again.');
+                }
+            } catch (error) {
+                alert('Error sending OTP. Please try again.');
+            }
+        });
+        
+        verifyOtpBtn.addEventListener('click', async () => {
+            const phone = document.getElementById('phone').value;
+            const otp = document.getElementById('otp').value;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/verify-otp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ phone, otp }),
+                });
+                
+                if (response.ok) {
+                    phoneVerified = true;
+                    passwordContainer.style.display = 'block';
+                    otpContainer.style.display = 'none';
+                    document.getElementById('phone').disabled = true;
+                    submitBtn.disabled = false;
+                } else {
+                    alert('Invalid OTP. Please try again.');
+                }
+            } catch (error) {
+                alert('Error verifying OTP. Please try again.');
+            }
+        });
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!phoneVerified) {
+                alert('Please verify your phone number first.');
+                return;
+            }
+            
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match.');
+                return;
+            }
+            
+            const userData = {
+                name: document.getElementById('fullName').value,
+                phone: document.getElementById('phone').value,
+                user_type: document.getElementById('userType').value,
+                password: password,
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData),
+                });
+                
+                if (response.ok) {
+                    alert('Registration successful!');
+                    window.location.href = '/login';  // Redirect to login page
+                } else {
+                    const error = await response.json();
+                    alert(error.detail || 'Registration failed. Please try again.');
+                }
+            } catch (error) {
+                alert('Error during registration. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

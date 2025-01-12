@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!----======== CSS ======== -->
+    <link rel="stylesheet" href="../style.css">
+
+    <!----===== Iconscout CSS ===== -->
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+
+    <title>Quick Hire</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .filters-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .filter-input {
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 0.95rem;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 1px #3182ce;
+        }
+
+        .rate-range {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .rate-input {
+            width: 100px;
+        }
+
+        .developers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .developer-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .developer-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .developer-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-online {
+            background-color: #dcffe4;
+            color: #0a5d1d;
+        }
+
+        .status-offline {
+            background-color: #ffe5e5;
+            color: #9b1c1c;
+        }
+
+        .rate {
+            font-size: 1.25rem;
+            color: #2b6cb0;
+            margin-bottom: 0.5rem;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .skill-tag {
+            background-color: #e2e8f0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.875rem;
+            color: #4a5568;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .call-btn {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .call-btn.enabled {
+            background-color: #3182ce;
+            color: white;
+        }
+
+        .call-btn.enabled:hover {
+            background-color: #2c5282;
+        }
+
+        .call-btn.disabled {
+            background-color: #e2e8f0;
+            color: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: #e53e3e;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="logo-name">
+            <div class="logo-image">
+                <img src="../images/logo.png" alt="">
+            </div>
+
+            <span class="logo_name">Quick Hire</span>
+        </div>
+
+        <div class="menu-items">
+            <ul class="nav-links">
+                <li><a href="#">
+                        <i class="uil uil-estate" style="color: var(--primary-color);"></i>
+                        <span class="link-name" style="color: var(--primary-color);">Developers</span>
+                    </a></li>
+                <li><a href="/balance">
+                        <i class="uil uil-files-landscapes"></i>
+                        <span class="link-name">Balance</span>
+                    </a></li>
+                <li><a href="/me">
+                        <i class="uil uil-share"></i>
+                        <span class="link-name">Profile / Edit</span>
+                    </a></li>
+            </ul>
+
+            <ul class="logout-mode">
+                <li><a href="#">
+                        <i class="uil uil-signout" onclick="logout()"></i>
+                        <span class="link-name" onclick="logout()">Logout</span>
+                    </a></li>
+
+                <li class="mode">
+                    <a href="#">
+                        <i class="uil uil-moon"></i>
+                        <span class="link-name">Dark Mode</span>
+                    </a>
+
+                    <div class="mode-toggle">
+                        <span class="switch"></span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="dashboard">
+        <div class="top">
+            <i class="uil uil-bars sidebar-toggle">&nbsp;&nbsp;&nbsp;Developers</i>
+        </div>
+
+        <div class="dash-content">
+            <div class="filters-section">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label" for="name-search">Name</label>
+                        <input type="text" id="name-search" class="filter-input" placeholder="Search by name">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label" for="skill-search">Skill</label>
+                        <input type="text" id="skill-search" class="filter-input" placeholder="Search by skill">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label" for="status-filter">Status</label>
+                        <select id="status-filter" class="filter-input">
+                            <option value="all">All</option>
+                            <option value="online">Online</option>
+                            <option value="offline">Offline</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Hourly Rate</label>
+                        <div class="rate-range">
+                            <input type="number" id="min-rate" class="filter-input rate-input" placeholder="Min $">
+                            <input type="number" id="max-rate" class="filter-input rate-input" placeholder="Max $">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="developers-grid" class="developers-grid">
+                <div class="loading">Loading developers...</div>
+            </div>
+        </div>
+    </section>
+    <script>
+        let allDevelopers = [];
+        const audio = new Audio('/mp3/calling.mp3');
+
+        async function fetchDevelopers() {
+            try {
+                const response = await fetch('https://api.amanpatel.in/developers');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch developers');
+                }
+                allDevelopers = await response.json();
+                filterAndDisplayDevelopers();
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('developers-grid').innerHTML = `
+                    <div class="error">Error loading developers. Please try again later.</div>
+                `;
+            }
+        }
+
+        function filterAndDisplayDevelopers() {
+            const nameSearch = document.getElementById('name-search').value.toLowerCase();
+            const skillSearch = document.getElementById('skill-search').value.toLowerCase();
+            const statusFilter = document.getElementById('status-filter').value;
+            const minRate = document.getElementById('min-rate').value;
+            const maxRate = document.getElementById('max-rate').value;
+
+            let filteredDevelopers = allDevelopers.filter(dev => {
+                const nameMatch = dev.name.toLowerCase().includes(nameSearch);
+                const skillMatch = !skillSearch || (dev.skills || []).some(skill =>
+                    skill.toLowerCase().includes(skillSearch)
+                );
+                const statusMatch = statusFilter === 'all' ||
+                    (statusFilter === 'online' && dev.live_status) ||
+                    (statusFilter === 'offline' && !dev.live_status);
+                const rateMatch = (!minRate || dev.rate >= minRate) &&
+                    (!maxRate || dev.rate <= maxRate);
+
+                return nameMatch && skillMatch && statusMatch && rateMatch;
+            });
+
+            displayDevelopers(filteredDevelopers);
+        }
+
+
+
+
+
+        function displayDevelopers(developers) {
+            const grid = document.getElementById('developers-grid');
+
+            if (developers.length === 0) {
+                grid.innerHTML = `<div class="no-results">No developers found matching your criteria</div>`;
+                return;
+            }
+
+            grid.innerHTML = developers.map(dev => `
+                <div class="developer-card" data-developer-id="${dev.id}">
+                    <div class="developer-name">${dev.name}</div>
+                    <div class="status-badge ${dev.live_status ? 'status-online' : 'status-offline'}">
+                        ${dev.live_status ? 'Online' : 'Offline'}
+                    </div>
+                    <div class="rate">$${dev.rate}/hr</div>
+                    <div class="skills">
+                        ${(dev.skills || []).map(skill => `
+                            <span class="skill-tag">${skill}</span>
+                        `).join('')}
+                    </div>
+                    <div class="description">${dev.description || 'No description available'}</div>
+                    <div class="call-container">
+                        <button 
+                            class="call-btn ${dev.live_status && dev.id !== localStorage.getItem('user_id') ? 'enabled' : 'disabled'}"
+                            ${!dev.live_status || dev.id === localStorage.getItem('user_id') ? 'disabled' : ''}
+                            data-developer-id="${dev.id}"
+                            onclick="handleCall('${dev.id}', '${dev.name.replace(/'/g, "\\'")}')"
+                        >
+                            ${dev.id === localStorage.getItem('user_id') ? 'It\'s You' : (dev.live_status ? 'Call Now' : 'Currently Unavailable')}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add styles if not already present
+            if (!document.getElementById('call-styles')) {
+                const style = document.createElement('style');
+                style.id = 'call-styles';
+                style.textContent = `
+                    .developer-card {
+                        position: relative;
+                    }
+                    
+                    .call-container {
+                        position: relative;
+                        margin-top: 10px;
+                    }
+                    
+                    .call-status {
+                        margin-top: 10px;
+                        text-align: center;
+                    }
+                    
+                    .calling-status {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 10px;
+                        margin-top: 8px;
+                    }
+                    
+                    .calling-text {
+                        color: #2196F3;
+                        font-weight: 500;
+                    }
+                    
+                    .decline-btn {
+                        background: #f44336;
+                        color: white;
+                        border: none;
+                        padding: 5px 10px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 14px;
+                    }
+                    
+                    .decline-btn:hover {
+                        background: #d32f2f;
+                    }
+                    
+                    .declined-message {
+                        color: #f44336;
+                        font-weight: 500;
+                        margin-top: 8px;
+                    }
+                    
+                    .error-message {
+                        color: #f44336;
+                        font-weight: 500;
+                        margin-top: 8px;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        let activeCallId = null;
+        let activeCallTimer = null;
+
+        function removeExistingCallStatus() {
+            const existingStatus = document.querySelector('.call-status');
+            if (existingStatus) {
+                existingStatus.remove();
+            }
+        }
+        // function showCallingStatus(statusDiv, developerName, developerId) {
+        //     console.log("444444");
+
+        //     statusDiv.innerHTML = `
+        //         <div class="calling-status" data-calling-id="${developerId}">
+        //             <span class="calling-text">Calling ${developerName}...</span>
+        //             <button class="decline-btn" onclick="declineCall('${developerId}')">Cancel Call</button>
+        //         </div>
+        //     `;
+        // }
+
+        function showCallingStatus(developerName, callId) {
+            const userId = localStorage.getItem('user_id');
+            console.log("show notification is calledd");
+
+
+
+            const modal = document.createElement('div');
+            modal.className = 'call-notification-modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>Calling...</h3>
+                    <img src="/images/caller.jpeg" alt="${developerName}" style="border-radius: 50%; width: 100px; height: 100px;">
+                    <p>${developerName}</p>
+                    <div class="modal-buttons">
+                        <button onclick="rejectCall('${callId}', '${userId}')">
+                            Decline
+                        </button>
+                    </div>
+                </div>
+            `;
+            localStorage.setItem('other_person', developerName);
+            document.body.appendChild(modal);
+        }
+
+        function declineCall() {
+            if (activeCallId) {
+                // Send decline message through WebSocket
+                ws.send(JSON.stringify({
+                    type: 'call_declined',
+                    call_id: activeCallId
+                }));
+
+                // Show declined message
+                const statusDiv = document.querySelector('.call-status');
+                if (statusDiv) {
+                    statusDiv.innerHTML = '<div class="declined-message">Call cancelled</div>';
+                    // Remove the message after 3 seconds
+                    setTimeout(() => {
+                        statusDiv.remove();
+                    }, 3000);
+                }
+
+                // Clear active call
+                activeCallId = null;
+            }
+        }
+        function declineCall(developerId) {
+            if (activeCallId) {
+                ws.send(JSON.stringify({
+                    type: 'call_declined',
+                    call_id: activeCallId
+                }));
+
+                showDeclinedMessage(developerId);
+            }
+        }
+        function showDeclinedMessage(developerId) {
+            const card = document.querySelector(`[data-developer-id="${developerId}"]`).closest('.developer-card');
+            const statusDiv = card.querySelector('.call-status');
+
+            if (statusDiv) {
+                statusDiv.innerHTML = '<div class="declined-message">Call cancelled</div>';
+                setTimeout(() => {
+                    statusDiv.remove();
+                    activeCallId = null;
+                }, 3000);
+            }
+        }
+
+        function showCallError(statusDiv) {
+            statusDiv.innerHTML = '<div class="error-message">Failed to initiate call</div>';
+            setTimeout(() => {
+                statusDiv.remove();
+            }, 3000);
+        }
+        // Add event listeners for filters
+        document.getElementById('name-search').addEventListener('input', filterAndDisplayDevelopers);
+        document.getElementById('skill-search').addEventListener('input', filterAndDisplayDevelopers);
+        document.getElementById('status-filter').addEventListener('change', filterAndDisplayDevelopers);
+        document.getElementById('min-rate').addEventListener('input', filterAndDisplayDevelopers);
+        document.getElementById('max-rate').addEventListener('input', filterAndDisplayDevelopers);
+
+        // Fetch developers when the page loads
+        fetchDevelopers();
+        function logout() {
+            // Clear all items from localStorage
+            localStorage.clear();
+
+            // Redirect to the login page
+            window.location.href = "/login";
+        }
+        // Add this to your existing JavaScript code
+
+        let ws = null;
+        let userId = null; // Should be set when user logs in
+
+        function initializeWebSocket(currentUserId) {
+            userId = currentUserId;
+            ws = new WebSocket(`wss://api.amanpatel.in/ws/${userId}`);
+
+            ws.onmessage = async (event) => {
+                const data = JSON.parse(event.data);
+
+                if (data.type === 'call_request') {
+                    showCallNotification(data);
+                } else if (data.type === 'call_accepted') {
+                    // Redirect both users to the call room
+                    window.location.href = data.room_url;
+                } else if (data.type === 'call_declined') {
+                    rejectCall(data.callId, data.callerId)
+                }
+            };
+
+            ws.onclose = () => {
+                // Attempt to reconnect after a delay
+                setTimeout(() => initializeWebSocket(userId), 3000);
+            };
+        }
+
+        function showCallNotification(callData) {
+            console.log("show notification is calledd");
+
+            const modal = document.createElement('div');
+            modal.className = 'call-notification-modal';
+            modal.innerHTML = `
+            <div class="modal-content">
+                <h3>Incoming Call</h3>
+                <img src="/images/caller.jpeg" alt="${callData.caller_name}" style="border-radius: 50%; width: 100px; height: 100px;">
+                <p>${callData.caller_name} is calling you</p>
+                <div class="modal-buttons">
+                <button onclick="acceptCall('${callData.call_id}', '${callData.caller_id}')">
+                    Accept
+                </button>
+                <button onclick="rejectCall('${callData.call_id}', '${callData.caller_id}')">
+                    Decline
+                </button>
+                </div>
+            </div>
+            `;
+            localStorage.setItem('other_person', callData.caller_name);
+
+            document.body.appendChild(modal);
+            audio.loop = true;
+            audio.play();
+        }
+
+        async function handleCall(developerId, developerName) {
+            const userId = localStorage.getItem('user_id');
+            if (!userId) {
+                alert('Please log in to make calls');
+                window.location.href = '/login';
+                return;
+            }
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/initiate-call', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        caller_id: userId,
+                        receiver_id: developerId
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to initiate call');
+                }
+
+                const result = await response.json();
+                let call_id = result.call_id;
+
+                showCallingStatus(developerName, call_id);
+
+            } catch (error) {
+                console.error('Error initiating call:', error);
+                alert('Failed to initiate call. Please try again.');
+            }
+        }
+
+        async function acceptCall(callId, callerId) {
+            audio.pause();
+            // Send acceptance through WebSocket
+            ws.send(JSON.stringify({
+                type: 'call_accepted',
+                call_id: callId,
+                caller_id: callerId
+            }));
+            const modal = document.querySelector('.call-notification-modal');
+            if (modal) {
+                modal.remove();
+            }
+            window.location.href = '/call-room/?id=' + callId;
+        }
+
+        function rejectCall(callId, callerId) {
+            audio.pause();
+            // Send decline message through WebSocket
+            ws.send(JSON.stringify({
+                type: 'call_declined',
+                call_id: callId,
+                caller_id: callerId  // Add this so we know who to notify
+            }));
+
+            // Remove notification modal
+            const modal = document.querySelector('.call-notification-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Add this CSS to your stylesheet
+        const style = document.createElement('style');
+        style.textContent = `
+    .call-notification-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 60px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .modal-buttons {
+        margin-top: 20px;
+    }
+
+    .modal-buttons button {
+        margin: 0 10px;
+        padding: 8px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .modal-buttons button:first-child {
+        background: #4CAF50;
+        color: white;
+    }
+
+    .modal-buttons button:last-child {
+        background: #f44336;
+        color: white;
+    }
+`;
+        document.head.appendChild(style);
+        initializeWebSocket(localStorage.getItem('user_id'));
+        ws.onmessage = async (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                console.log('Received message:', data);
+
+                switch (data.type) {
+                    case 'call_request':
+                        showCallNotification(data);
+                        break;
+                    case 'call_accepted':
+                        window.location.href = data.room_url;
+                        break;
+                    case 'call_declined':
+                        if (activeCallId === data.call_id) {
+                            const statusDiv = document.querySelector('.call-status');
+                            if (statusDiv) {
+                                statusDiv.innerHTML = '<div class="declined-message">Call declined</div>';
+                                setTimeout(() => {
+                                    statusDiv.remove();
+                                }, 3000);
+                                activeCallId = null;
+                            }
+                        }
+                        break;
+                    default:
+                        console.log('Unknown message type:', data.type);
+                }
+            } catch (error) {
+                console.error('Error processing message:', error);
+            }
+        };
+    </script>
+
+    <script src="../script.js"></script>
+</body>
+
+</html>
